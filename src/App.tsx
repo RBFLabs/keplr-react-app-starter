@@ -18,7 +18,10 @@ function App() {
             </a>
           </div>
         ) : (
-          <AuthzForm />
+          <>
+            <AuthzForm />
+            <StakeForm />
+          </>
         )}
       </div>
     </div>
