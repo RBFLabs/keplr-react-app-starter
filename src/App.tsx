@@ -1,5 +1,6 @@
 import { useKeplr } from "./features/keplr";
 import { StakeForm } from "./features/keplr/components";
+import { AuthzForm } from "./features/keplr/components";
 import "./App.css";
 
 function App() {
@@ -17,7 +18,7 @@ function App() {
             </a>
           </div>
         ) : (
-          <StakeForm />
+          <AuthzForm />
         )}
       </div>
     </div>

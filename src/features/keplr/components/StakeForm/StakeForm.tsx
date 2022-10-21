@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
 import { GasPrice, coins, calculateFee } from "@cosmjs/stargate";
+import {
+  MsgExec,
+  MsgGrant,
+  MsgRevoke,
+} from "cosmjs-types/cosmos/authz/v1beta1/tx";
+import { Any } from "cosmjs-types/google/protobuf/any.js";
 import { ConnectWalletButton } from "../ConnectWalletButton/ConnectWalletButton";
 import { useKeplr } from "../../hooks";
 import { getExplorerLink } from "../../utils";
@@ -8,7 +14,10 @@ import {
   junoTestValidators,
   osmosisTestValidators,
 } from "../../chain-infos";
-import type { SigningStargateClient } from "@cosmjs/stargate";
+import {
+  assertIsDeliverTxSuccess,
+  SigningStargateClient,
+} from "@cosmjs/stargate";
 
 interface Validators {
   [chainId: string]: string[];
@@ -30,6 +39,27 @@ export const StakeForm = () => {
   const [sending, setSending] = useState(false);
   const [userBalance, setUserBalance] = useState<number>();
   const { keplrAccount } = useKeplr();
+
+  const grant = async (grantee: string) => {
+    const { account, chain, client } = keplrAccount;
+    const msgType = MsgGrant.fromPartial({ grantee });
+    const msgBytes = MsgGrant.encode(msgType).finish();
+    const txmsg = Any.fromPartial({
+      typeUrl: "/cosmos.authz.v1beta1.MsgGrant",
+      value: msgBytes,
+    });
+    const gasPrice = GasPrice.fromString(
+      `0.002${chain.stakeCurrency.coinMinimalDenom}`
+    );
+    const txFee = calculateFee(300000, gasPrice);
+    const result = await client.signAndBroadcast(
+      account.address,
+      [txmsg],
+      txFee,
+      "grant"
+    );
+    assertIsDeliverTxSuccess(result);
+  };
 
   const clearTxData = () => {
     setError(false);
