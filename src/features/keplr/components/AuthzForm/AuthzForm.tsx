@@ -12,6 +12,10 @@ import {
 } from "cosmjs-types/cosmos/authz/v1beta1/tx";
 import { MsgDelegate } from "cosmjs-types/cosmos/staking/v1beta1/tx";
 import { GenericAuthorization } from "cosmjs-types/cosmos/authz/v1beta1/authz";
+import {
+  StakeAuthorization,
+  AuthorizationType,
+} from "cosmjs-types/cosmos/staking/v1beta1/authz";
 import { QueryClientImpl } from "cosmjs-types/cosmos/authz/v1beta1/query";
 import { Any } from "cosmjs-types/google/protobuf/any.js";
 import { ConnectWalletButton } from "../ConnectWalletButton/ConnectWalletButton";
@@ -39,10 +43,11 @@ export const AuthzForm = () => {
     const grantedMsg = "/cosmos.staking.v1beta1.MsgDelegate";
     const grant = {
       authorization: {
-        typeUrl: "/cosmos.authz.v1beta1.GenericAuthorization",
-        value: GenericAuthorization.encode(
-          GenericAuthorization.fromPartial({
-            msg: grantedMsg,
+        typeUrl: "/cosmos.staking.v1beta1.StakeAuthorization",
+        value: StakeAuthorization.encode(
+          StakeAuthorization.fromPartial({
+            authorizationType: AuthorizationType.AUTHORIZATION_TYPE_DELEGATE,
+            allowList: { address: junoTestValidators },
           })
         ).finish(),
       },
